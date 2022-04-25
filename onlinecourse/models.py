@@ -139,8 +139,8 @@ class Submission(models.Model):
 
 
 class Submission_choices(models.Model):
-    choice_id = models.ForeignKey(Choice)
-    submission_id = models.ForeignKey(Submission)
+    choice_id = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    submission_id = models.ForeignKey(Submission, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.choice_id + self.submission_id
