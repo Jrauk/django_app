@@ -75,6 +75,8 @@ class Lesson(models.Model):
     order = models.IntegerField(default=0)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.TextField()
+    def __str__(self):
+        return self.title
 
 
 # Enrollment model
@@ -89,15 +91,15 @@ class Enrollment(models.Model):
         (HONOR, 'Honor'),
         (BETA, 'BETA')
     ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     date_enrolled = models.DateField(default=now)
     mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
     rating = models.FloatField(default=5.0)
 
 class Question(models.Model):
-    course_id = models.ForeignKey(Course,on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete-models.CASCADE)
+    course_id = models.ManyToManyField(course)
     question_text = models.CharField(null=False,max_length=500)
     grade = models.IntegerField()
 
@@ -111,10 +113,15 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
-    question_id=models.ForeignKey(Question,on_delete=models.CASCADE)
-    choice_text=models.CharField(null=False,max_length=100)
-    is_correct=models.BooleanField()
+    question_id = models.ManyToManyField(Question)
+    question = models.ForeignKey(Question,on_delete=models.CASCADE)
+    choice_text = models.CharField(null=False,max_length=100)
+    is_correct = models.BooleanField()
+    def __str__(self):
+        return self.choice_text
 
 class Submission(models.Model):
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
     choices = models.ManyToManyField(Choice)
+    def __str__(self):
+        return str(self.pk)
