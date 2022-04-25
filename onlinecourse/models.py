@@ -114,7 +114,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question_id = models.ManyToManyField(Question)
-    question = models.ForeignKey(Question,on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(null=False,max_length=100)
     is_correct = models.BooleanField()
     def __str__(self):
