@@ -93,8 +93,6 @@ class Lesson(models.Model):
 # <HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
 # And we could use the enrollment to track information such as exam submissions
 class Enrollment(models.Model):
-    date_enrolled = models.DateField(default=now)
-    mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
     AUDIT = 'audit'
     HONOR = 'honor'
     BETA = 'BETA'
@@ -103,6 +101,8 @@ class Enrollment(models.Model):
         (HONOR, 'Honor'),
         (BETA, 'BETA')
     ]
+    date_enrolled = models.DateField(default=now)
+    mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
     rating = models.FloatField(default=5.0)
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
