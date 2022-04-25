@@ -25,17 +25,6 @@ class Instructor(models.Model):
 
 # Learner model
 class Learner(models.Model):
-        occupation = models.CharField(
-        null=False,
-        max_length=20,
-        choices=OCCUPATION_CHOICES,
-        default=STUDENT
-    )
-    social_link = models.URLField(max_length=200)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
     STUDENT = 'student'
     DEVELOPER = 'developer'
     DATA_SCIENTIST = 'data_scientist'
@@ -46,6 +35,17 @@ class Learner(models.Model):
         (DATA_SCIENTIST, 'Data Scientist'),
         (DATABASE_ADMIN, 'Database Admin')
     ]
+    occupation = models.CharField(
+    null=False,
+    max_length=20,
+    choices=OCCUPATION_CHOICES,
+    default=STUDENT
+    )
+    social_link = models.URLField(max_length=200)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.user.username + "," + \
