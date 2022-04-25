@@ -98,7 +98,7 @@ class Enrollment(models.Model):
     rating = models.FloatField(default=5.0)
 
 class Question(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete-models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     course_id = models.ManyToManyField(course)
     question_text = models.CharField(null=False,max_length=500)
     grade = models.IntegerField()
