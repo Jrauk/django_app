@@ -68,6 +68,14 @@ class Course(models.Model):
         return "Name: " + self.name + "," + \
                "Description: " + self.description
 
+# course instructors
+Class Course_instructor(models.Model)
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    instructor_id = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return "Course: " + self.course_id + "," + \
+               "Instructor: " + self.instructor_id
 
 # Lesson model
 class Lesson(models.Model):
@@ -76,7 +84,7 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.TextField()
     def __str__(self):
-        return self.title
+        return "Lesson name: " + self.title
 
 
 # Enrollment model
@@ -99,7 +107,7 @@ class Enrollment(models.Model):
 
 class Question(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    course_id = models.ManyToManyField(course)
+    courses = models.ManyToManyField(Course)
     question_text = models.CharField(null=False,max_length=500)
     grade = models.IntegerField()
 
