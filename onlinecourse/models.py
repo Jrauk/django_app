@@ -12,12 +12,12 @@ import uuid
 
 # Instructor model
 class Instructor(models.Model):
+    full_time = models.BooleanField(default=True)
+    total_learners = models.IntegerField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    full_time = models.BooleanField(default=True)
-    total_learners = models.IntegerField()
 
     def __str__(self):
         return self.user.username
@@ -25,6 +25,13 @@ class Instructor(models.Model):
 
 # Learner model
 class Learner(models.Model):
+        occupation = models.CharField(
+        null=False,
+        max_length=20,
+        choices=OCCUPATION_CHOICES,
+        default=STUDENT
+    )
+    social_link = models.URLField(max_length=200)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -39,13 +46,6 @@ class Learner(models.Model):
         (DATA_SCIENTIST, 'Data Scientist'),
         (DATABASE_ADMIN, 'Database Admin')
     ]
-    occupation = models.CharField(
-        null=False,
-        max_length=20,
-        choices=OCCUPATION_CHOICES,
-        default=STUDENT
-    )
-    social_link = models.URLField(max_length=200)
 
     def __str__(self):
         return self.user.username + "," + \
@@ -58,7 +58,6 @@ class Course(models.Model):
     image = models.ImageField(upload_to='course_images/')
     description = models.CharField(max_length=1000)
     pub_date = models.DateField(null=True)
-    instructors = models.ManyToManyField(Instructor)
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, through='Enrollment')
     total_enrollment = models.IntegerField(default=0)
@@ -68,7 +67,8 @@ class Course(models.Model):
         return "Name: " + self.name + "," + \
                "Description: " + self.description
 
-# course instructors
+
+# Course instructors model
 Class Course_instructor(models.Model)
     course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
     instructor_id = models.ForeignKey(Instructor, on_delete=models.CASCADE)
@@ -77,12 +77,14 @@ Class Course_instructor(models.Model)
         return "Course: " + self.course_id + "," + \
                "Instructor: " + self.instructor_id
 
+
 # Lesson model
 class Lesson(models.Model):
     title = models.CharField(max_length=200, default="title")
     order = models.IntegerField(default=0)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.TextField()
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    
     def __str__(self):
         return "Lesson name: " + self.title
 
@@ -91,6 +93,8 @@ class Lesson(models.Model):
 # <HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
 # And we could use the enrollment to track information such as exam submissions
 class Enrollment(models.Model):
+    date_enrolled = models.DateField(default=now)
+    mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
     AUDIT = 'audit'
     HONOR = 'honor'
     BETA = 'BETA'
@@ -99,17 +103,16 @@ class Enrollment(models.Model):
         (HONOR, 'Honor'),
         (BETA, 'BETA')
     ]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date_enrolled = models.DateField(default=now)
-    mode = models.CharField(max_length=5, choices=COURSE_MODES, default=AUDIT)
     rating = models.FloatField(default=5.0)
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.CASCADE)
+    course_id = models.ForeignKey(Course, on_delete=models.CASCADE)
+    
 
 class Question(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    courses = models.ManyToManyField(Course)
+    lesson_id = models.ManyToManyField(Lesson, through='Course')
     question_text = models.CharField(null=False,max_length=500)
     grade = models.IntegerField()
+    choice = models.ManyToManyField(choice_id, through='submission_choices')
 
     def is_get_score(self, selected_ids):
         all_answers = self.choice_set.filter(is_correct=True).count()
@@ -121,15 +124,23 @@ class Question(models.Model):
 
 
 class Choice(models.Model):
-    question_id = models.ManyToManyField(Question)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(null=False,max_length=100)
     is_correct = models.BooleanField()
+    question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     def __str__(self):
         return self.choice_text
 
+
 class Submission(models.Model):
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
-    choices = models.ManyToManyField(Choice)
+    
     def __str__(self):
-        return str(self.pk)
+        return str(self.enrollment)
+
+
+class submission_choices(models.Model)
+    choice_id = models.ForeignKey(Choice)
+    submission_id = models.ForeignKey(Submission)
+    
+    def __str__(self):
+        return self.choice_id + self.submission_id
