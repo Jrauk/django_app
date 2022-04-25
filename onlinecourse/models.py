@@ -138,7 +138,7 @@ class Submission(models.Model):
         return str(self.enrollment)
 
 
-class submission_choices(models.Model)
+class Submission_choices(models.Model)
     choice_id = models.ForeignKey(Choice)
     submission_id = models.ForeignKey(Submission)
     
